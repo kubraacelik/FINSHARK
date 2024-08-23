@@ -38,26 +38,26 @@ namespace api.Repository
 
             _context.Stocks.Remove(stockModel);
 
-           await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-           return stockModel;
+            return stockModel;
         }
 
         public async Task<List<Stock>> GetAllAsync()
         {
-            return await _context.Stocks.ToListAsync();
+            return await _context.Stocks.Include(c => c.Comments).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _context.Stocks.FindAsync(id);
+            return await _context.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
         {
             var existingStock = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
 
-             if (existingStock == null)
+            if (existingStock == null)
             {
                 return null;
             }
@@ -69,7 +69,7 @@ namespace api.Repository
             existingStock.Industry = stockDto.Industry;
             existingStock.MarketCap = stockDto.MarketCap;
 
-             await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return existingStock;
         }
