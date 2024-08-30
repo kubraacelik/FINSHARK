@@ -42,17 +42,17 @@ namespace api.Repository
 
         public async Task<List<Comment>> GetAllAsync()
         {
-            return await _context.Comments.ToListAsync();
+            return await _context.Comments.Include(a => a.AppUser).ToListAsync();
         }
 
         public async Task<Comment?> GetByIdAsync(int id)
         {
-            return await _context.Comments.FindAsync(id);
+            return await _context.Comments.Include(a => a.AppUser).FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<Comment?> UpdateAsync(int id, Comment commentModel)
         {
-             var existingComment = await _context.Comments.FindAsync(id);
+            var existingComment = await _context.Comments.FindAsync(id);
 
             if (existingComment == null)
             {
@@ -60,7 +60,7 @@ namespace api.Repository
             }
 
             existingComment.Title = commentModel.Title;
-            existingComment.Content = commentModel.Content;           
+            existingComment.Content = commentModel.Content;
 
             await _context.SaveChangesAsync();
 
